@@ -7,13 +7,15 @@ function canStartGame(): boolean {
 }
 
 // 오브젝트(F키 상호작용) 이벤트
-App.onObjectTouched.Add((player: ScriptPlayer, obj: ScriptGameObject) => {
+App.onAppObjectTouched.Add((player: ScriptPlayer, obj: ScriptGameObject) => {
+  player.showCenterLabel(`DEBUG: ${obj.text}`);
   if (obj.text === "start") {   
     if (canStartGame()) {
       startState(STATE_INTRO); 
     } else {
-      player.showCenterLabel("2명 이상일 때만 시작할 수 있습니다!");
+      player.showCenterLabel("⚠️ 2명 이상일 때만 시작할 수 있습니다!");
     }
   }
 });
+
 
