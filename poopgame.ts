@@ -23,14 +23,10 @@ let _levelTimer = 15;
 let _levelAddTimer = 0;
 
 let _start = false;
-let _ending = false;
 let _timer = 5;
 
-let _poops: any[] = [];
 let _stateTimer = 0;
-
 let _genTime = 0;
-let _dropTime = 0;
 let _flushTime = 0;
 
 let _viewPlayer = false;
@@ -39,19 +35,16 @@ let _viewAddTimer = 0;
 
 let _live = 0;
 let _liveList = "";
-let lastSurvivor: Player | null = null;
+let lastSurvivor: ScriptPlayer | null = null;
 
-let _widget: Widget | null = null;
-let _widget2: Widget | null = null;
-let _players: Player[] = App.players;
-
+let _widget: ScriptWidget | null = null;
+let _players: ScriptPlayer[] = App.players;
 let poopkeys: any[] = [];
 
 // =================== 라벨 출력 함수 ===================
-function customShowLabelWithRadius(player: Player, str: string, width: number, radius: number) {
-  if (player.isMobile) {
-    width = 100;
-  }
+function customShowLabelWithRadius(player: ScriptPlayer, str: string, width: number, radius: number) {
+  if (player.isMobile) width = 100;
+
   const spanStyle = `<span style="
     position: absolute;
     margin: auto;
@@ -71,8 +64,7 @@ function customShowLabelWithRadius(player: Player, str: string, width: number, r
 }
 
 function showLabel(str: string) {
-  for (let i in _players) {
-    const p = _players[i];
+  for (let p of _players) {
     customShowLabelWithRadius(p, str, 40, 14);
   }
 }
@@ -98,11 +90,9 @@ export function startState(state: number) {
       showLabel("- 게임목표 - \n\n 위에서 떨어지는 똥을 피해 마지막까지 생존하세요 \n\n ( 잠시 후 게임이 시작됩니다 )");
       _stateTimer = 0;
       _genTime = 0;
-      _dropTime = 0;
       _timer = 90;
 
-      for (let i in _players) {
-        let p = _players[i];
+      for (let p of _players) {
         p.tag = { alive: true };
       }
       break;
@@ -125,8 +115,7 @@ export function startState(state: number) {
 
     case STATE_END:
       _start = false;
-      for (let i in _players) {
-        let p = _players[i];
+      for (let p of _players) {
         p.sprite = null;
         p.moveSpeed = 80;
         p.sendUpdated();
@@ -144,7 +133,7 @@ App.onInit.Add(() => {
   }
 });
 
-App.onJoinPlayer.Add((p: Player) => {
+App.onJoinPlayer.Add((p: ScriptPlayer) => {
   if (_start) {
     p.tag = { alive: false };
     p.moveSpeed = 20;
@@ -157,7 +146,7 @@ App.onJoinPlayer.Add((p: Player) => {
   _players = App.players;
 });
 
-App.onLeavePlayer.Add((p: Player) => {
+App.onLeavePlayer.Add((p: ScriptPlayer) => {
   p.title = null;
   p.sprite = null;
   p.moveSpeed = 80;
@@ -165,7 +154,7 @@ App.onLeavePlayer.Add((p: Player) => {
   _players = App.players;
 });
 
-App.onAppObjectTouched.Add((player: Player, key, x, y, tileID) => {
+App.onAppObjectTouched.Add((player: ScriptPlayer, key, x, y, tileID) => {
   if (player.tag.alive) {
     _viewPlayer = true;
     _viewAddTimer = 0;
@@ -193,8 +182,7 @@ App.onDestroy.Add(() => {
 function checkSuvivors() {
   if (!_start) return;
   let alive = 0;
-  for (let i in _players) {
-    const p = _players[i];
+  for (let p of _players) {
     if (!p.sprite) {
       lastSurvivor = p;
       ++alive;
@@ -206,8 +194,7 @@ function checkSuvivors() {
 function broardCastingSuvivors() {
   if (!_start) return;
   _liveList = "";
-  for (let i in _players) {
-    const p = _players[i];
+  for (let p of _players) {
     if (p.tag.alive) {
       _liveList += p.name + " ";
     }
